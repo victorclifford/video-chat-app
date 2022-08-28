@@ -1,11 +1,12 @@
-const app = require("express")();
+const express = require("express");
+const app = express();
 const server = require("http").createServer(app);
 const cors = require("cors");
+const path = require("path");
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
+    origin: "http://localhost:3000",
   },
 });
 
@@ -13,8 +14,14 @@ app.use(cors());
 
 const PORT = process.env.PORT || 5050;
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("server is running...");
+});
+
+//deployement---------------------
+app.use(express.static(path.join(__dirname, "/client/build")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/client/build", "index.html"));
 });
 
 io.on("connection", (Socket) => {
